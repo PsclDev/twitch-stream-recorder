@@ -24,7 +24,7 @@ client_id = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 client_secret = "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz"
 ```
 `root_path` - path to a folder where you want your VODs to be saved to  
-`export_path` - path to a folder where you want your VODs to be saved after the proccesses 
+`export_path` - path to a folder where you want your VODs to be saved after the proccesses  
 `username` - name of the streamer you want to record by default  
 `client_id` - you can grab this from [here](https://dev.twitch.tv/console/apps) once you register your application  
 `client_secret` - you generate this [here](https://dev.twitch.tv/console/apps) as well, for your registered application
