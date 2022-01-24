@@ -28,6 +28,7 @@ class TwitchRecorder:
         self.disable_ffmpeg = False
         self.refresh = 15
         self.root_path = config.root_path
+        self.export_path = config.export_path        
 
         # user configuration
         self.username = config.username
@@ -52,12 +53,16 @@ class TwitchRecorder:
         recorded_path = os.path.join(self.root_path, "recorded", self.username)
         # path to finished video, errors removed
         processed_path = os.path.join(self.root_path, "processed", self.username)
+        # path to exported video, errors removed
+        export_path = os.path.join(self.export_path, "vod", self.username)
 
         # create directory for recordedPath and processedPath if not exist
         if os.path.isdir(recorded_path) is False:
             os.makedirs(recorded_path)
         if os.path.isdir(processed_path) is False:
             os.makedirs(processed_path)
+        if os.path.isdir(export_path) is False:
+            os.makedirs(export_path)
 
         # make sure the interval to check user availability is not less than 15 seconds
         if self.refresh < 15:
@@ -73,21 +78,24 @@ class TwitchRecorder:
             for f in video_list:
                 recorded_filename = os.path.join(recorded_path, f)
                 processed_filename = os.path.join(processed_path, f)
-                self.process_recorded_file(recorded_filename, processed_filename)
+                export_filename = os.path.join(export_path, f)
+                self.process_recorded_file(recorded_filename, processed_filename, export_filename)
         except Exception as e:
             logging.error(e)
 
         logging.info("checking for %s every %s seconds, recording with %s quality",
                      self.username, self.refresh, self.quality)
-        self.loop_check(recorded_path, processed_path)
+        self.loop_check(recorded_path, processed_path, export_path)
 
-    def process_recorded_file(self, recorded_filename, processed_filename):
+    def process_recorded_file(self, recorded_filename, processed_filename, export_path):
         if self.disable_ffmpeg:
             logging.info("moving: %s", recorded_filename)
             shutil.move(recorded_filename, processed_filename)
         else:
             logging.info("fixing %s", recorded_filename)
             self.ffmpeg_copy_and_fix_errors(recorded_filename, processed_filename)
+
+        shutil.move(processed_filename, export_path)
 
     def ffmpeg_copy_and_fix_errors(self, recorded_filename, processed_filename):
         try:
@@ -118,7 +126,7 @@ class TwitchRecorder:
                     status = TwitchResponseStatus.NOT_FOUND
         return status, info
 
-    def loop_check(self, recorded_path, processed_path):
+    def loop_check(self, recorded_path, processed_path, export_path):
         while True:
             status, info = self.check_user()
             if status == TwitchResponseStatus.NOT_FOUND:
@@ -141,12 +149,15 @@ class TwitchRecorder:
                 channel = next(iter(channels), None)
                 filename = self.username + " - " + datetime.datetime.now() \
                     .strftime("%Y-%m-%d %Hh%Mm%Ss") + " - " + channel.get("title") + ".mp4"
+                exportName = channel.get("title") + ".mp4"
 
                 # clean filename from unnecessary characters
                 filename = "".join(x for x in filename if x.isalnum() or x in [" ", "-", "_", "."])
+                exportName = "".join(x for x in exportName if x.isalnum() or x in [" ", "-", "_", "."])
 
                 recorded_filename = os.path.join(recorded_path, filename)
                 processed_filename = os.path.join(processed_path, filename)
+                export_filename = os.path.join(export_path, exportName)
 
                 # start streamlink process
                 subprocess.call(
@@ -155,7 +166,7 @@ class TwitchRecorder:
 
                 logging.info("recording stream is done, processing video file")
                 if os.path.exists(recorded_filename) is True:
-                    self.process_recorded_file(recorded_filename, processed_filename)
+                    self.process_recorded_file(recorded_filename, processed_filename, export_filename)
                 else:
                     logging.info("skip fixing, file not found")
 
