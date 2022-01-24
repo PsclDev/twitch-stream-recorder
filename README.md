@@ -1,6 +1,6 @@
-# Ancalentari Twitch Stream Recorder
-This script allows you to record twitch streams live to .mp4 files.  
-It is an improved version of [junian's twitch-recorder](https://gist.github.com/junian/b41dd8e544bf0e3980c971b0d015f5f6), migrated to [**helix**](https://dev.twitch.tv/docs/api) - the new twitch API. It uses OAuth2.
+# PsclDev Twitch Stream Recorder
+This script allows you to record twitch streams live to .mp4 files and save it later to your NAS.  
+It is an improved version from ancalentari which improved the version of [junian's twitch-recorder](https://gist.github.com/junian/b41dd8e544bf0e3980c971b0d015f5f6), migrated to [**helix**](https://dev.twitch.tv/docs/api) - the new twitch API. It uses OAuth2.
 ## Requirements
 1. [python3.8](https://www.python.org/downloads/release/python-380/) or higher  
 2. [streamlink](https://streamlink.github.io/)  
@@ -17,12 +17,14 @@ It is an improved version of [junian's twitch-recorder](https://gist.github.com/
    * Linux:      ```python3.8 -m pip install requests```
 3) Create `config.py` file in the same directory as `twitch-recorder.py` with:
 ```properties
-root_path = "/home/abathur/Videos/twitch"
+root_path = "/home/{username}/twitch"
+export_path = "/mnt/nas/twitch"
 username = "forsen"
 client_id = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 client_secret = "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz"
 ```
 `root_path` - path to a folder where you want your VODs to be saved to  
+`export_path` - path to a folder where you want your VODs to be saved after the proccesses 
 `username` - name of the streamer you want to record by default  
 `client_id` - you can grab this from [here](https://dev.twitch.tv/console/apps) once you register your application  
 `client_secret` - you generate this [here](https://dev.twitch.tv/console/apps) as well, for your registered application
